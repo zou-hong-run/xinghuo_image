@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>讯飞AI绘画 - 创意图像生成</title>
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.11.2/css/all.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.11.2/css/v4-shims.css"
+    />
+    <style>
+      :root {
+        --primary-color: #2d8cf0;
+        --primary-hover: #57a3f3;
+        --success-color: #19be6b;
+        --error-color: #ed4014;
+        --text-color: #333;
+        --light-text: #666;
+        --border-color: #e8eaec;
+        --bg-color: #f8f8f9;
+        --card-bg: #fff;
+        --chat-user-bg: #f0f7ff;
+        --chat-ai-bg: #f9f9f9;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        padding: 0;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      @media (min-width: 992px) {
+        .container {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--border-color);
+        grid-column: 1 / -1;
+      }
+
+      h1 {
+        color: var(--primary-color);
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: var(--light-text);
+        font-size: 16px;
+      }
+
+      .card {
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        margin-bottom: 20px;
+        height: 100%;
+      }
+
+      .card-title {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color: var(--text-color);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+      }
+
+      .card-title svg {
+        margin-right: 8px;
+        color: var(--primary-color);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-color);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(45, 140, 240, 0.2);
+      }
+
+      textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .form-hint {
+        font-size: 12px;
+        color: var(--light-text);
+        margin-top: 5px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-hover);
+      }
+
+      .btn-block {
+        display: flex;
+        width: 100%;
+      }
+
+      .btn-lg {
+        padding: 14px 28px;
+        font-size: 16px;
+      }
+
+      .result-image {
+        max-width: 100%;
+        border-radius: 4px;
+        display: block;
+        margin: 10px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        max-height: 400px;
+        object-fit: contain;
+      }
+
+      .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(45, 140, 240, 0.1);
+        border-radius: 50%;
+        border-top-color: var(--primary-color);
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      .loading-text {
+        color: var(--primary-color);
+        font-weight: 500;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-message {
+        color: var(--error-color);
+        background-color: rgba(237, 64, 20, 0.1);
+        padding: 15px;
+        border-radius: 4px;
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+      }
+
+      .error-message svg {
+        margin-right: 10px;
+      }
+
+      .dimension-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .btn-secondary {
+        background-color: white;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+      }
+
+      .btn-secondary:hover {
+        background-color: rgba(45, 140, 240, 0.1);
+      }
+
+      /* 聊天记录样式 */
+      .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 60px);
+      }
+
+      .chat-history {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background-color: var(--card-bg);
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 12px;
+        border-radius: 8px;
+        max-width: 80%;
+      }
+
+      .user-message {
+        align-self: flex-end;
+        background-color: var(--chat-user-bg);
+        border-bottom-right-radius: 0;
+      }
+
+      .ai-message {
+        align-self: flex-start;
+        background-color: var(--chat-ai-bg);
+        border-bottom-left-radius: 0;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 12px;
+        color: var(--light-text);
+      }
+
+      .message-role {
+        font-weight: bold;
+      }
+
+      .message-time {
+        opacity: 0.8;
+      }
+
+      .message-content {
+        word-wrap: break-word;
+      }
+
+      .session-info {
+        font-size: 12px;
+        color: var(--light-text);
+        margin-bottom: 10px;
+        padding: 8px;
+        background-color: var(--bg-color);
+        border-radius: 4px;
+      }
+
+      .empty-chat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--light-text);
+        text-align: center;
+      }
+
+      .empty-chat i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: var(--border-color);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+          grid-template-columns: 1fr;
+        }
+
+        .dimension-controls {
+          grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        .message {
+          max-width: 90%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>讯飞AI绘画</h1>
+        <p class="subtitle">用文字描述你的创意，AI帮你生成精美图像</p>
+      </header>
+
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-paint-brush"></i>创作参数</h2>
+
+        <div class="form-group">
+          <label for="prompt">创意描述</label>
+          <textarea
+            id="prompt"
+            class="form-control"
+            placeholder="请详细描述你想要生成的图像内容，例如：帮我画一座被云雾环绕的雪山，山脚下有清澈的湖泊，风格为水墨画"
+          >
+帮我画一座山</textarea
+          >
+          <p class="form-hint">描述越详细，生成的图像越符合你的预期</p>
+        </div>
+
+        <div class="dimension-controls">
+          <div class="form-group">
+            <label for="width">图像宽度 (px)</label>
+            <input
+              type="number"
+              id="width"
+              class="form-control"
+              min="128"
+              max="1024"
+              value="512"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="height">图像高度 (px)</label>
+            <input
+              type="number"
+              id="height"
+              class="form-control"
+              min="128"
+              max="1024"
+              value="512"
+            />
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="generateBtn" class="btn btn-primary btn-lg btn-block">
+            <i class="fas fa-magic"></i> 生成图像
+          </button>
+          <button id="clearBtn" class="btn btn-secondary btn-lg btn-block">
+            <i class="fas fa-trash-alt"></i> 清空
+          </button>
+        </div>
+
+        <div id="errorContainer" class="error-message" style="display: none">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span id="errorMessage"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-comments"></i>对话记录</h2>
+
+        <div class="chat-container">
+          <div id="sessionInfo" class="session-info" style="display: none">
+            会话ID: <span id="sessionIdDisplay"></span>
+          </div>
+
+          <div id="chatHistory" class="chat-history">
+            <div class="empty-chat">
+              <i class="fas fa-comment-dots"></i>
+              <p>对话记录将显示在这里</p>
+            </div>
+          </div>
+
+          <div
+            id="loadingIndicator"
+            class="loading-container"
+            style="display: none"
+          >
+            <div class="loading-spinner"></div>
+            <p class="loading-text">AI正在创作中，请稍候...</p>
+          </div>
+
+          <div id="resultContainer">
+            <img
+              id="imageResult"
+              class="result-image"
+              style="display: none"
+              alt="AI生成的图像"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const promptEl = document.getElementById("prompt");
+        const widthEl = document.getElementById("width");
+        const heightEl = document.getElementById("height");
+        const generateBtn = document.getElementById("generateBtn");
+        const clearBtn = document.getElementById("clearBtn");
+        const chatHistoryEl = document.getElementById("chatHistory");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+        const errorContainer = document.getElementById("errorContainer");
+        const errorMessageEl = document.getElementById("errorMessage");
+        const imageResult = document.getElementById("imageResult");
+        const sessionInfoEl = document.getElementById("sessionInfo");
+        const sessionIdDisplay = document.getElementById("sessionIdDisplay");
+
+        let currentSessionId =
+          localStorage.getItem("aiArtSessionId") || crypto.randomUUID();
+
+        // 初始化时加载历史记录
+        loadChatHistory();
+
+        // 清空按钮事件
+        clearBtn.addEventListener("click", function () {
+          promptEl.value = "";
+          widthEl.value = "512";
+          heightEl.value = "512";
+        });
+
+        // 生成按钮事件
+        generateBtn.addEventListener("click", async function () {
+          const prompt = promptEl.value.trim();
+          const width = parseInt(widthEl.value);
+          const height = parseInt(heightEl.value);
+
+          // 验证输入
+          if (!prompt) {
+            showError("请输入创意描述");
+            return;
+          }
+
+          if (isNaN(width) || width < 128 || width > 1024) {
+            showError("宽度必须介于128-1024之间");
+            return;
+          }
+
+          if (isNaN(height) || height < 128 || height > 1024) {
+            showError("高度必须介于128-1024之间");
+            return;
+          }
+
+          // 开始生成
+          startGenerating();
+
+          try {
+            // 添加用户消息到聊天记录
+            addMessageToChat("user", prompt);
+
+            const response = await fetch("/api/generate-image", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                prompt,
+                width,
+                height,
+                sessionId: currentSessionId,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`请求失败: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            // 保存会话ID到本地存储
+            if (result.sessionId) {
+              currentSessionId = result.sessionId;
+              localStorage.setItem("aiArtSessionId", currentSessionId);
+              updateSessionInfo(result.sessionId);
+            }
+
+            // 显示AI响应
+            if (result.payload?.choices?.text?.[0]?.content) {
+              const imageData = result.payload.choices.text[0].content;
+              if (imageData.startsWith("data:image/")) {
+                imageResult.src = imageData;
+              } else {
+                imageResult.src = "data:image/png;base64," + imageData;
+              }
+              imageResult.style.display = "block";
+
+              // 添加AI消息到聊天记录
+              addMessageToChat("assistant", "", true);
+            }
+
+            // 更新聊天历史
+            if (result.chatHistory) {
+              renderChatHistory(result.chatHistory);
+            }
+          } catch (error) {
+            showError(`生成失败: ${error.message}`);
+            console.error("生成图像出错:", error);
+          } finally {
+            stopGenerating();
+          }
+        });
+
+        // 加载聊天历史
+        async function loadChatHistory() {
+          if (!currentSessionId) return;
+
+          try {
+            const response = await fetch(
+              `/api/chat-history/${currentSessionId}`
+            );
+            if (response.ok) {
+              const data = await response.json();
+              if (data.messages && data.messages.length > 0) {
+                renderChatHistory(data.messages);
+                updateSessionInfo(data.sessionId);
+
+                // 显示最后生成的图像
+                const lastImageMessage = [...data.messages]
+                  .reverse()
+                  .find((m) => m.image);
+                if (lastImageMessage) {
+                  const imageData = lastImageMessage.content;
+                  if (imageData.startsWith("data:image/")) {
+                    imageResult.src = imageData;
+                  } else {
+                    imageResult.src = "data:image/png;base64," + imageData;
+                  }
+                  imageResult.style.display = "block";
+                }
+              }
+            }
+          } catch (error) {
+            console.error("加载聊天历史出错:", error);
+          }
+        }
+
+        // 渲染聊天历史
+        function renderChatHistory(messages) {
+          if (!messages || messages.length === 0) {
+            chatHistoryEl.innerHTML = `
+            <div class="empty-chat">
+              <i class="fas fa-comment-dots"></i>
+              <p>对话记录将显示在这里</p>
+            </div>
+          `;
+            return;
+          }
+
+          chatHistoryEl.innerHTML = "";
+          messages.forEach((message) => {
+            addMessageToChat(
+              message.role,
+              message.content,
+              message.image,
+              message.timestamp,
+              false
+            );
+          });
+
+          // 滚动到底部
+          chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+        }
+
+        // 添加消息到聊天记录
+        function addMessageToChat(
+          role,
+          content,
+          isImage = false,
+          timestamp = new Date(),
+          scrollToBottom = true
+        ) {
+          // 如果聊天记录是空的，移除占位符
+          if (chatHistoryEl.querySelector(".empty-chat")) {
+            chatHistoryEl.innerHTML = "";
+          }
+
+          const messageEl = document.createElement("div");
+          messageEl.className = `message ${role}-message`;
+
+          const timeString = new Date(timestamp).toLocaleTimeString();
+
+          messageEl.innerHTML = `
+          <div class="message-header">
+            <span class="message-role">${
+              role === "user" ? "你" : "AI助手"
+            }</span>
+            <span class="message-time">${timeString}</span>
+          </div>
+          <div class="message-content">
+            ${isImage ? "<p>已生成图像 ↓</p>" : content}
+          </div>
+        `;
+
+          chatHistoryEl.appendChild(messageEl);
+
+          if (scrollToBottom) {
+            chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+          }
+        }
+
+        // 更新会话信息
+        function updateSessionInfo(sessionId) {
+          sessionIdDisplay.textContent = sessionId;
+          sessionInfoEl.style.display = "block";
+        }
+
+        // 开始生成
+        function startGenerating() {
+          loadingIndicator.style.display = "flex";
+          errorContainer.style.display = "none";
+          generateBtn.disabled = true;
+          generateBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+        }
+
+        // 停止生成
+        function stopGenerating() {
+          loadingIndicator.style.display = "none";
+          generateBtn.disabled = false;
+          generateBtn.innerHTML = '<i class="fas fa-magic"></i> 生成图像';
+        }
+
+        // 显示错误
+        function showError(message) {
+          errorMessageEl.textContent = message;
+          errorContainer.style.display = "flex";
+          stopGenerating();
+        }
+      });
+    </script>
+  </body>
+</html>
