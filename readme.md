@@ -146,7 +146,9 @@ xinghuo_image/
 
 您的支持是我最大的更新动力
 
-<img src="../../%25E6%2598%259F%25E7%2581%25AB%25E5%25A4%25A7%25E6%25A8%25A1%25E5%259E%258B/xinghuo/readme.assets/mm_facetoface_collect_qrcode_1732632562648.png" alt="mm_facetoface_collect_qrcode_1732632562648" style="zoom:25%;" />
+<img src="readme.assets/mm_facetoface_collect_qrcode_1732632562648.png" alt="mm_facetoface_collect_qrcode_1732632562648" style="zoom: 25%;" />
 
-<img src="../../%25E6%2598%259F%25E7%2581%25AB%25E5%25A4%25A7%25E6%25A8%25A1%25E5%259E%258B/xinghuo/readme.assets/1732632622.jpg" alt="1732632622" style="zoom:25%;" />
+
+
+<img src="readme.assets/1732632622.jpg" alt="1732632622" style="zoom: 25%;" />
 
